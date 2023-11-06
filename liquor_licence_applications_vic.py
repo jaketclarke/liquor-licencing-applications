@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from custom_selenium import WebPuppet
 from helpers import wait_with_message
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 
 
 class LiquorLicenceApplicationsVic(WebPuppet):
@@ -41,4 +42,38 @@ class LiquorLicenceApplicationsVic(WebPuppet):
 
         # we want the third one - the applications
         forms[2].submit()
-        wait_with_message("waiting after click", 5)
+
+        wait_with_message("waiting after changing form", 2)
+
+        #!todo make this a loop for all items
+        # save separate files
+        # process
+        # merge
+
+        # find local gov control
+        local_gov_menu = Select(
+            self.browser.find_element(By.XPATH, "//select[@name='local_gov_area']")
+        )
+
+        # select first local gov
+        #!Todo loop through all - load from another method
+        local_gov_menu.select_by_visible_text("ALPINE SHIRE COUNCIL")
+
+        wait_with_message("waiting after changing local gov", 3)
+
+        # submit form
+        self.browser.find_element(By.XPATH, "//input[@name='Submit']").click()
+
+        wait_with_message("waiting after submit", 5)
+
+        # clean up data
+
+        results = self.browser.find_elements(By.XPATH, "//div[@class='result']")
+        # print(results)
+
+        for result in results:
+            # print(result)
+            items = result.find_elements(By.XPATH, "//div[@class='result-details']")
+
+            for item in items:
+                print(item.text)
