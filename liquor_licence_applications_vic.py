@@ -3,6 +3,7 @@
 from dotenv import load_dotenv
 from custom_selenium import WebPuppet
 from helpers import wait_with_message
+from selenium.webdriver.common.by import By
 
 
 class LiquorLicenceApplicationsVic(WebPuppet):
@@ -33,4 +34,11 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         """
 
         self.browser.get(self.url)
-        wait_with_message("waiting to load page", 5)
+        wait_with_message("waiting to load page", 2)
+
+        # find all forms
+        forms = self.browser.find_elements(By.XPATH, "//form[@name='menu_body']")
+
+        # we want the third one - the applications
+        forms[2].submit()
+        wait_with_message("waiting after click", 5)
