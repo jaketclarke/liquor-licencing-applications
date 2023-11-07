@@ -2,6 +2,10 @@
 
 This project uses Python to drive Selenium to scrape data on liquor licences in Victoria.
 
+## Grab the latest run
+
+The latest data can be found here: https://jaketclarkepublic.blob.core.windows.net/liquor-licencing/applications/vic-applications-latest.csv
+
 ## Getting Started
 
 * ensure you follow this guide <https://cloudbytes.dev/snippets/run-selenium-and-chrome-on-wsl2>

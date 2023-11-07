@@ -17,5 +17,5 @@ upload_file_to_blob(
     os.getenv("BLOB_CONNECTION_STRING"),
     os.getenv("BLOB_CONTAINER_NAME"),
     f"applications{os.sep}vic-applications-latest.csv",
-    f"{webpuppet.output_directory}{os.sep}{webpuppet.output_filename},csv",
+    f"{webpuppet.output_directory}{os.sep}{webpuppet.output_filename}.csv",
 )
