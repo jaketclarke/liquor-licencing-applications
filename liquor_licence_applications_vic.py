@@ -23,6 +23,7 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         load_dotenv()
         self.url = "https://liquor.vcglr.vic.gov.au/alarm_internet/alarm_internet.ASP?WCI=index_action&WCU"
         self.applications = []
+        self.lga_names = []
 
         # this makes an instance of our parent class
         super().__init__()
@@ -45,8 +46,6 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         lga = "ARARAT RURAL CITY COUNCIL"
         self.get_data_for_a_local_gov(lga)
 
-        self.export_data()
-
     def export_data(self):
         df = pd.DataFrame(self.applications)
 
@@ -55,6 +54,29 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         df.to_csv(
             f"{self.output_directory}{os.sep}{self.output_filename}.csv", index=False
         )
+
+    def get_lgas(self):
+        self.browser.get(self.url)
+        wait_with_message("waiting to load page", 2)
+
+        # find all forms
+        forms = self.browser.find_elements(By.XPATH, "//form[@name='menu_body']")
+
+        # we want the third one - the applications
+        forms[2].submit()
+
+        wait_with_message("waiting after changing form", 2)
+
+        # find local gov control
+        local_gov_menu = Select(
+            self.browser.find_element(By.XPATH, "//select[@name='local_gov_area']")
+        )
+
+        options = [x.text for x in local_gov_menu.options]
+
+        self.lga_names = options
+
+        wait_with_message("waiting after changing local gov", 3)
 
     def get_data_for_a_local_gov(self, lga):
         self.browser.get(self.url)
