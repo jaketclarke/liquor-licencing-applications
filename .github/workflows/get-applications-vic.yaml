@@ -38,7 +38,7 @@ jobs:
         with:
           envkey_WHERE_AM_I: ${{ secrets.WHERE_AM_I}}
           envkey_OUTPUT_DIRECTORY: ${{ secrets.OUTPUT_DIRECTORY}}
-          envkey_OUTPUT_FILEPATH: ${{ secrets.OUTPUT_FILEPATH}}
+          envkey_OUTPUT_FILENAME: ${{ secrets.OUTPUT_FILENAME}}
           envkey_BLOB_CONTAINER_NAME: ${{ secrets.BLOB_CONTAINER_NAME}}
           envkey_BLOB_CONNECTION_STRING: ${{ secrets.BLOB_CONNECTION_STRING}}
           fail_on_empty: true
