@@ -39,6 +39,7 @@ class WebPuppet(object):
         # set env vars
         env_vars = [
             "OUTPUT_DIRECTORY",
+            "OUTPUT_FILENAME"
         ]
 
         # set properties from env vars

@@ -1,10 +1,12 @@
 """Class for interacting with the VCGLR website"""
 
+import os
 from dotenv import load_dotenv
 from custom_selenium import WebPuppet
-from helpers import wait_with_message
+from helpers import create_directory_if_not_exists, wait_with_message
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+import pandas as pd
 
 
 class LiquorLicenceApplicationsVic(WebPuppet):
@@ -20,6 +22,7 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         # we can add magic specific to this we want to do here
         load_dotenv()
         self.url = "https://liquor.vcglr.vic.gov.au/alarm_internet/alarm_internet.ASP?WCI=index_action&WCU"
+        self.applications = []
 
         # this makes an instance of our parent class
         super().__init__()
@@ -34,6 +37,26 @@ class LiquorLicenceApplicationsVic(WebPuppet):
             object: selenium browser object
         """
 
+        # select first local gov
+        #!Todo loop through all - load from another method
+        lga = "ALPINE SHIRE COUNCIL"
+        self.get_data_for_a_local_gov(lga)
+
+        lga = "ARARAT RURAL CITY COUNCIL"
+        self.get_data_for_a_local_gov(lga)
+
+        self.export_data()
+
+    def export_data(self):
+        df = pd.DataFrame(self.applications)
+
+        create_directory_if_not_exists(self.output_directory)
+
+        df.to_csv(
+            f"{self.output_directory}{os.sep}{self.output_filename}.csv", index=False
+        )
+
+    def get_data_for_a_local_gov(self, lga):
         self.browser.get(self.url)
         wait_with_message("waiting to load page", 2)
 
@@ -44,20 +67,12 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         forms[2].submit()
 
         wait_with_message("waiting after changing form", 2)
-
-        #!todo make this a loop for all items
-        # save separate files
-        # process
-        # merge
-
         # find local gov control
         local_gov_menu = Select(
             self.browser.find_element(By.XPATH, "//select[@name='local_gov_area']")
         )
 
-        # select first local gov
-        #!Todo loop through all - load from another method
-        local_gov_menu.select_by_visible_text("ALPINE SHIRE COUNCIL")
+        local_gov_menu.select_by_visible_text(lga)
 
         wait_with_message("waiting after changing local gov", 3)
 
@@ -69,11 +84,27 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         # clean up data
 
         results = self.browser.find_elements(By.XPATH, "//div[@class='result']")
-        # print(results)
 
         for result in results:
-            # print(result)
-            items = result.find_elements(By.XPATH, "//div[@class='result-details']")
+            tidy_result = {}
+            tidy_result["lga"] = lga
+            tidy_result["id"] = results.index(result)
 
-            for item in items:
-                print(item.text)
+            # a block of text with each key value pair on a new line
+            textblock = result.text
+
+            for line in textblock.split("\n"):
+                # each row in the form
+                # "Licence Category: On-Premises Licence"
+                # Except a line with both application id and a short title
+                # E.g 46837A09 BOB SUGAR FALLS CREEK, FALLS CREEK 3699
+                try:
+                    # e.g "Licence Category: On-Premises Licence"
+                    vals = line.split(":")
+                    tidy_result[vals[0].strip()] = vals[1].strip()
+                except:
+                    # E.g 46837A09 BOB SUGAR FALLS CREEK, FALLS CREEK 3699
+                    tidy_result["Application ID"] = line[0:9].strip()
+                    tidy_result["Application Name"] = line[9:].strip()
+
+            self.applications.append(tidy_result)
