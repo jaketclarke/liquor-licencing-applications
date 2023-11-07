@@ -38,13 +38,12 @@ class LiquorLicenceApplicationsVic(WebPuppet):
             object: selenium browser object
         """
 
-        # select first local gov
-        #!Todo loop through all - load from another method
-        lga = "ALPINE SHIRE COUNCIL"
-        self.get_data_for_a_local_gov(lga)
+        # make sure we have list of LGAs
+        self.get_lgas()
 
-        lga = "ARARAT RURAL CITY COUNCIL"
-        self.get_data_for_a_local_gov(lga)
+        # if dev, don't run all data in interests of speed
+        for lga in self.lga_names:
+            self.get_data_for_a_local_gov(lga)
 
     def export_data(self):
         df = pd.DataFrame(self.applications)

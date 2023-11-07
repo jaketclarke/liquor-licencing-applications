@@ -2,6 +2,7 @@
 import os
 import time
 import shutil
+from azure.storage.blob import BlobServiceClient
 
 
 def wait_with_message(message: str, wait: float) -> None:
@@ -50,3 +51,33 @@ def delete_file_if_exists(filepath: str) -> None:
     """
     if os.path.exists(filepath):
         os.remove(filepath)
+
+
+def upload_file_to_blob(
+    connection_string: str, container_name: str, blob_path: str, upload_filepath: str
+) -> None:
+    """Upload a blob to a container from a local filepath
+
+    Args:
+        connection_string (str): blob connnection string
+        container_name (str): blob container name
+        blob_path (str): path to file in blob e.g folder1/test.txt
+        upload_filepath (str): where to find it locally e.g. output/test22.txt
+    """
+    try:
+        blob_service_client = BlobServiceClient.from_connection_string(
+            connection_string
+        )
+    except RuntimeError as ex:
+        raise RuntimeError("Could not make blob service client") from ex
+
+    try:
+        blob_client = blob_service_client.get_blob_client(
+            container=container_name, blob=blob_path
+        )
+        with open(upload_filepath, mode="rb") as data:
+            blob_client.upload_blob(data, overwrite=True)
+    except RuntimeError as ex:
+        raise RuntimeError(
+            f"Could not upload file {upload_filepath} to blob {blob_path}"
+        ) from ex

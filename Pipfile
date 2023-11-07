@@ -10,6 +10,7 @@ python-dotenv = "*"
 webdriver-manager = "*"
 pandas = "*"
 termcolor = "*"
+azure-storage-blob = "*"
 
 [dev-packages]
 pylint = "*"
