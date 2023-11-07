@@ -1,4 +1,8 @@
-# Getting Started
+# Liquor Licencing Applications
+
+This project uses Python to drive Selenium to scrape data on liquor licences in Victoria.
+
+## Getting Started
 
 * ensure you follow this guide <https://cloudbytes.dev/snippets/run-selenium-and-chrome-on-wsl2>
 * if you don't you'll see an error like `selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary`
@@ -9,6 +13,9 @@
 ```text
 WHERE_AM_I=dev
 OUTPUT_DIRECTORY=output
+OUTPUT_FILENAME=export
+BLOB_CONTAINER_NAME=liquor-licencing
+BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=https;..........EndpointSuffix=core.windows.net
 ```
 
 In production, set the environment variable `WHERE_AM_I=Production`, this will turn the launching of the Chrome browser off.
