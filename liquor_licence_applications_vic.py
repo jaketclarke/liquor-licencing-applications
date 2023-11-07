@@ -74,6 +74,9 @@ class LiquorLicenceApplicationsVic(WebPuppet):
 
         options = [x.text for x in local_gov_menu.options]
 
+        # remove first element - empty string - from list
+        options = options[1:]
+
         self.lga_names = options
 
         wait_with_message("waiting after changing local gov", 3)
