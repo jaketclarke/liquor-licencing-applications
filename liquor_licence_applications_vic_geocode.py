@@ -8,17 +8,16 @@ from pandas_geojson import to_geojson, write_geojson
 
 from dotenv import load_dotenv
 
+from azure_maps_geocode import AzureMapsGeocode
+
 load_dotenv()
 
 OUTPUT_DIRECTORY = os.getenv("OUTPUT_DIRECTORY")
 OUTPUT_FILENAME = os.getenv("OUTPUT_FILENAME")
 AZURE_SUBSCRIPTION_KEY = os.getenv("AZURE_SUBSCRIPTION_KEY")
 
-credential = AzureKeyCredential(AZURE_SUBSCRIPTION_KEY)
+amg = AzureMapsGeocode()
 
-search_client = MapsSearchClient(
-    credential=credential,
-)
 
 # read output
 location = f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}.csv"
@@ -29,7 +28,7 @@ for index, row in input.iterrows():
     if index % 10 == 0:
         time.sleep(10)
 
-    search_result = search_client.search_address(row["Premises Address"])
+    search_result = amg.search_client.search_address(row["Premises Address"])
 
     res = {}
 

@@ -1,12 +1,16 @@
 """ Run a scrape of the latest liquor licence applications in Vic"""
+import logging
 import os
+import sys
 
 from dotenv import load_dotenv
 from helpers import upload_file_to_blob, get_now_in_melbourne_string
 from liquor_licence_applications_vic import LiquorLicenceApplicationsVic
 
-# import env file
 load_dotenv()
+
+# configure logging
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 webpuppet = LiquorLicenceApplicationsVic()
 webpuppet.get_browser()
