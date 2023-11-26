@@ -12,6 +12,7 @@ pandas = "*"
 termcolor = "*"
 azure-storage-blob = "*"
 black = "*"
+azure-maps-search = "*"
 
 [dev-packages]
 pylint = "*"
