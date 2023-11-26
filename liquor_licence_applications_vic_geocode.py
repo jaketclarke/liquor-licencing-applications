@@ -28,24 +28,13 @@ for index, row in input.iterrows():
     if index % 10 == 0:
         time.sleep(10)
 
-    search_result = amg.search_client.search_address(row["Premises Address"])
-
-    res = {}
-
-    res["Premises Address"] = row["Premises Address"]
-    res["azure_maps_address_id"] = search_result.results[0].id
-    res["state"] = search_result.results[0].address.country_subdivision
-    res["suburb"] = search_result.results[0].address.municipality_subdivision
-    res["postcode"] = search_result.results[0].address.postal_code
-    res["lat"] = search_result.results[0].position.lat
-    res["lon"] = search_result.results[0].position.lon
-
-    results.append(res)
+    result = amg.geocode_address(row['id'], row['Premises Address'])
+    results.append(result)
+    
 
 results_df = pd.DataFrame(results)
-results_df.to_csv("temp.csv")
 
-output = pd.merge(left=input, right=results_df, on="Premises Address", how="left")
+output = pd.merge(left=input, right=results_df, left_on="Premises Address", right_on='input_address', how="left")
 output.to_csv(f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}-geocoded.csv")
 
 geo_json = to_geojson(

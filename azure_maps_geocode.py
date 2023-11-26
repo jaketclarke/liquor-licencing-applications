@@ -63,7 +63,12 @@ class AzureMapsGeocode(object):
                 f"The {env_var} field is required - check .env file or github secrets, {e}"
             ) from e
 
-    def _get_search_client(self) -> None:
+    def _get_search_client(self) -> MapsSearchClient:
+        """Gets search client for
+
+        Returns:
+            MapsSearchClient: gets MapsSearchClient for interacting with Azure Maps
+        """
         credential = AzureKeyCredential(self.azure_subscription_key)
 
         search_client = MapsSearchClient(
@@ -71,3 +76,29 @@ class AzureMapsGeocode(object):
         )
 
         return search_client
+
+    def geocode_address(self, input_id: str, address: str) -> dict:
+        """Geocode an input address
+
+        Args:
+            input_id (str): id for input address (so you can join back to an input dataframe)
+            address (str): address to search for
+
+        Returns:
+            res (dict): geocoded address dictionary
+        """
+
+        search_result = self.search_client.search_address(address)
+
+        res = {}
+
+        res["input_address"] = address
+        res["input_id"] = input_id
+        res["azure_maps_address_id"] = search_result.results[0].id
+        res["state"] = search_result.results[0].address.country_subdivision
+        res["suburb"] = search_result.results[0].address.municipality_subdivision
+        res["postcode"] = search_result.results[0].address.postal_code
+        res["lat"] = search_result.results[0].position.lat
+        res["lon"] = search_result.results[0].position.lon
+
+        return res
