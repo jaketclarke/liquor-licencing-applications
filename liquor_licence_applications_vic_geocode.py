@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from azure.core.credentials import AzureKeyCredential
 from azure.maps.search import MapsSearchClient
+from pandas_geojson import to_geojson, write_geojson
 
 from dotenv import load_dotenv
 
@@ -27,10 +28,8 @@ results = []
 for index, row in input.iterrows():
     if index % 10 == 0:
         time.sleep(10)
-    
-    search_result = search_client.search_address(
-        row["Premises Address"]
-    )
+
+    search_result = search_client.search_address(row["Premises Address"])
 
     res = {}
 
@@ -45,7 +44,35 @@ for index, row in input.iterrows():
     results.append(res)
 
 results_df = pd.DataFrame(results)
-results_df.to_csv('temp.csv')
+results_df.to_csv("temp.csv")
 
-output = pd.merge(left=input, right=results_df, on="Premises Address",how="left")
-output.to_csv('temp.csv')
+output = pd.merge(left=input, right=results_df, on="Premises Address", how="left")
+output.to_csv(f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}-geocoded.csv")
+
+geo_json = to_geojson(
+    df=output,
+    lat="lat",
+    lon="lon",
+    properties=[
+        "Application ID",
+        "Application Name",
+        "Application Received Date",
+        "Premises Address",
+        "Application Type",
+        "Public Notice Display Period",
+        "Applicant",
+        "Licence Category",
+        "Licence Number",
+        "Star Rating",
+        "Demerit Points",
+        "state",
+        "suburb",
+        "postcode",
+    ],
+)
+
+write_geojson(
+    geo_json,
+    filename=f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}-geocoded.geojson",
+    indent=4,
+)

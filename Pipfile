@@ -13,6 +13,7 @@ termcolor = "*"
 azure-storage-blob = "*"
 black = "*"
 azure-maps-search = "*"
+pandas-geojson = "*"
 
 [dev-packages]
 pylint = "*"
