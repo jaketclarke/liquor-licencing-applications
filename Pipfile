@@ -11,6 +11,7 @@ webdriver-manager = "*"
 pandas = "*"
 termcolor = "*"
 azure-storage-blob = "*"
+black = "*"
 
 [dev-packages]
 pylint = "*"

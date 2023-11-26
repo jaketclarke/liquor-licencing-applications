@@ -7,6 +7,7 @@ from helpers import create_directory_if_not_exists, wait_with_message
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 import pandas as pd
+from termcolor import colored
 
 
 class LiquorLicenceApplicationsVic(WebPuppet):
@@ -41,7 +42,6 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         # make sure we have list of LGAs
         self.get_lgas()
 
-        # if dev, don't run all data in interests of speed
         for lga in self.lga_names:
             self.get_data_for_a_local_gov(lga)
 
@@ -76,9 +76,14 @@ class LiquorLicenceApplicationsVic(WebPuppet):
         # remove first element - empty string - from list
         options = options[1:]
 
-        self.lga_names = options
+        # don't run for every local gov in dev
+        if "dev" in self.where_am_i:
+            print(colored("WARNING ----- WARNING ----- Only running for Alpine Shire", "magenta"))
+            self.lga_names = ["ALPINE SHIRE COUNCIL"]
+        else:
+            self.lga_names = options
 
-        wait_with_message("waiting after changing local gov", 3)
+        wait_with_message("populated list of local governments", 3)
 
     def get_data_for_a_local_gov(self, lga):
         self.browser.get(self.url)

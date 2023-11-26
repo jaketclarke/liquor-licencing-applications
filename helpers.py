@@ -1,7 +1,9 @@
 """helper functions"""
+import datetime
 import os
 import time
 import shutil
+from zoneinfo import ZoneInfo
 from azure.storage.blob import BlobServiceClient
 
 
@@ -81,3 +83,21 @@ def upload_file_to_blob(
         raise RuntimeError(
             f"Could not upload file {upload_filepath} to blob {blob_path}"
         ) from ex
+
+
+def get_today_in_melbourne_string() -> str:
+    """
+    Return today's date in Melbourne - used as a default when getting data
+    """
+    return datetime.datetime.now(tz=ZoneInfo("Australia/Melbourne")).strftime(
+        "%Y-%m-%d"
+    )
+
+
+def get_now_in_melbourne_string() -> str:
+    """
+    Return today's date in Melbourne - used as a default when getting data
+    """
+    return datetime.datetime.now(tz=ZoneInfo("Australia/Melbourne")).strftime(
+        "%Y-%m-%d %H%I%S"
+    )
