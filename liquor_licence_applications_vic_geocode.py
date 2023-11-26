@@ -1,4 +1,5 @@
 """Code to geocode the address field from the liquor licence applications"""
+import time
 import pandas as pd
 import os
 from azure.core.credentials import AzureKeyCredential
@@ -18,13 +19,28 @@ search_client = MapsSearchClient(
     credential=credential,
 )
 
-search_result = search_client.search_address(
-    "1 Treasury Place, East Melbourne VIC 3002"
-)
-id = search_result.results[0].id
-state = search_result.results[0].address.country_subdivision
-suburb = search_result.results[0].address.municipality_subdivision
-postcode = search_result.results[0].address.postal_code
-lat = search_result.results[0].position.lat
-lon = search_result.results[0].position.lon
-print(id, state, postcode, suburb, lat, lon, id)
+# read output
+location = f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}.csv"
+
+input = pd.read_csv(location)
+results = []
+for index, row in input.iterrows():
+    if index % 10 == 0:
+        time.sleep(10)
+    
+    search_result = search_client.search_address(
+        row["Premises Address"]
+    )
+
+    res = {}
+
+    res["id"] = search_result.results[0].id
+    res["state"] = search_result.results[0].address.country_subdivision
+    res["suburb"] = search_result.results[0].address.municipality_subdivision
+    res["postcode"] = search_result.results[0].address.postal_code
+    res["lat"] = search_result.results[0].position.lat
+    res["lon"] = search_result.results[0].position.lon
+
+    results.append(res)
+
+print(results)
