@@ -34,7 +34,8 @@ for index, row in input.iterrows():
 
     res = {}
 
-    res["id"] = search_result.results[0].id
+    res["Premises Address"] = row["Premises Address"]
+    res["azure_maps_address_id"] = search_result.results[0].id
     res["state"] = search_result.results[0].address.country_subdivision
     res["suburb"] = search_result.results[0].address.municipality_subdivision
     res["postcode"] = search_result.results[0].address.postal_code
@@ -43,4 +44,8 @@ for index, row in input.iterrows():
 
     results.append(res)
 
-print(results)
+results_df = pd.DataFrame(results)
+results_df.to_csv('temp.csv')
+
+output = pd.merge(left=input, right=results_df, on="Premises Address",how="left")
+output.to_csv('temp.csv')
