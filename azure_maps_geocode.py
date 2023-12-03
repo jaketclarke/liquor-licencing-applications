@@ -88,7 +88,7 @@ class AzureMapsGeocode(object):
             res (dict): geocoded address dictionary
         """
 
-        search_result = self.search_client.search_address(address)
+        search_result = self.search_client.search_address(address, country_filter = ["AU"])
 
         res = {}
 
