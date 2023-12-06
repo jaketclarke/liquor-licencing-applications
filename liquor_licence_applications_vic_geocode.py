@@ -17,11 +17,12 @@ load_dotenv()
 OUTPUT_DIRECTORY = os.getenv("OUTPUT_DIRECTORY")
 OUTPUT_FILENAME = os.getenv("OUTPUT_FILENAME")
 
-location = f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}.csv"
+geocode_output_filepath = f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}-geocoded.csv"
+input_filepath = f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}.csv"
 errors_filepath = f"{OUTPUT_DIRECTORY}{os.sep}geocode-errors.json"
 
 # load input
-input = pd.read_csv(location)
+input_filepath = pd.read_csv(input_filepath)
 results = []
 
 # create geocode object
@@ -30,55 +31,84 @@ amg = AzureMapsGeocode()
 # place for errors
 errors = []
 
+i = 0
 # iterate over data
-for index, row in input.iterrows():
+for index, row in input_filepath.iterrows():
     # every 100th run, sleep - to not spam API
     if index % 100 == 0:
         time.sleep(10)
 
     # geocode address
-    try:
-        result = amg.geocode_address(row["id"], row["Premises Address"])
-        results.append(result)
-    except:
-        errors.append(result)
-        print(result)
+    if i < 250:
+        try:
+            result = amg.geocode_address(row["id"], row["Premises Address"])
+            results.append(result)
+        except:
+            errors.append(result)
+            print(result)
+
+        i += 1
 
 with open(errors_filepath, "w") as final:
     json.dump(errors, final)
 
+
 results_df = pd.DataFrame(results)
 
+#! todo
+# remove rows where coordinates are null
+# "coordinates": [
+#     NaN,
+#     NaN
+# ]
+
+#! todo
+# remove results where state != vic
+results_df = results_df.loc[results_df["state"] == "Victoria"]
+
 output = pd.merge(
-    left=input,
+    left=input_filepath,
     right=results_df,
     left_on="Premises Address",
     right_on="input_address",
     how="left",
 )
-output.to_csv(f"{OUTPUT_DIRECTORY}{os.sep}{OUTPUT_FILENAME}-geocoded.csv")
+
+# remove spaces from header names
+output.rename(columns=lambda x: str.lower(x.replace(" ", "_")), inplace=True)
+
+# replace "NaN" in output with something
+# comes out unquoted and breaks leaflet
+output = output.fillna("-")
+
+output.to_csv(geocode_output_filepath)
+
+#!todo
+## drop where lat invalid
+output =  output[output['lat'] != '-']
 
 geo_json = to_geojson(
     df=output,
     lat="lat",
     lon="lon",
     properties=[
-        "Application ID",
-        "Application Name",
-        "Application Received Date",
-        "Premises Address",
-        "Application Type",
-        "Public Notice Display Period",
-        "Applicant",
-        "Licence Category",
-        "Licence Number",
-        "Star Rating",
-        "Demerit Points",
+        "application_id",
+        "application_name",
+        "application_received_date",
+        "premises_address",
+        "application_type",
+        "public_notice_display_period",
+        "applicant",
+        "licence_category",
+        "licence_number",
+        "star_rating",
+        "demerit_points",
         "state",
         "suburb",
         "postcode",
     ],
 )
+
 
 write_geojson(
     geo_json,
