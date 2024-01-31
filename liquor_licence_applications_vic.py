@@ -78,7 +78,12 @@ class LiquorLicenceApplicationsVic(WebPuppet):
 
         # don't run for every local gov in dev
         if "dev" in self.where_am_i:
-            print(colored("WARNING ----- WARNING ----- Only running for Alpine Shire", "magenta"))
+            print(
+                colored(
+                    "WARNING ----- WARNING ----- Only running for Alpine Shire",
+                    "magenta",
+                )
+            )
             self.lga_names = ["ALPINE SHIRE COUNCIL"]
         else:
             self.lga_names = options

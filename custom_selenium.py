@@ -43,6 +43,7 @@ class WebPuppet(object):
             "WHERE_AM_I",
             "BLOB_CONTAINER_NAME",
             "BLOB_CONNECTION_STRING",
+            "AZURE_SUBSCRIPTION_KEY"
         ]
         # set properties from env vars
         for env_var in env_vars:

@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: "1 21 * * *"
+    - cron: "1 21 * * 0"
 jobs:
   scraper:
     runs-on: ubuntu-latest
@@ -41,6 +41,7 @@ jobs:
           envkey_OUTPUT_FILENAME: ${{ secrets.OUTPUT_FILENAME}}
           envkey_BLOB_CONTAINER_NAME: ${{ secrets.BLOB_CONTAINER_NAME}}
           envkey_BLOB_CONNECTION_STRING: ${{ secrets.BLOB_CONNECTION_STRING}}
+          envkey_AZURE_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SUBSCRIPTION_KEY}}
           fail_on_empty: true
 
       - name: Install dependencies
