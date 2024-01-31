@@ -39,8 +39,11 @@ class WebPuppet(object):
         # set env vars
         env_vars = [
             "OUTPUT_DIRECTORY",
+            "OUTPUT_FILENAME",
+            "WHERE_AM_I",
+            "BLOB_CONTAINER_NAME",
+            "BLOB_CONNECTION_STRING",
         ]
-
         # set properties from env vars
         for env_var in env_vars:
             self._set_attr_from_env_var(env_var)
@@ -51,7 +54,7 @@ class WebPuppet(object):
         self.output_directory_full_path = f"{Path.cwd()}{os.sep}{self.output_directory}"
         logging.info("download directory set to %s", self.output_directory_full_path)
 
-        # set env
+        # default for WHERE_AM_I
         self.where_am_i = os.getenv("WHERE_AM_I", "dev")
         logging.info("set where_am_i to %s", self.where_am_i)
 
