@@ -11,9 +11,11 @@ webdriver-manager = "*"
 pandas = "*"
 termcolor = "*"
 azure-storage-blob = "*"
-black = "*"
 azure-maps-search = "*"
 pandas-geojson = "*"
+googlemaps = "*"
+pre-commit = "*"
+black = "*"
 
 [dev-packages]
 pylint = "*"
